@@ -90,7 +90,7 @@
   - Add `frame-ancestor` Content Security Policy directive and set it to `none` to prevent the site from becoming framable. Implementation may differ depending on web frameworks and web servers used.
 
 - **Prevention Strategy:**    
-  - Add `frame-ancestor` directive.
+  - Add `frame-ancestor` directive for the Content Security Policy.
   - Set value of the directive with `none`.
   - Apply regular code reviews and testing.
 
