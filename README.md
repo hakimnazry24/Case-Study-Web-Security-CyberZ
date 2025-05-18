@@ -55,8 +55,8 @@
 - **OWASP Reference:**    
     [https://owasp.org/www-community/controls/Content_Security_Policy](https://owasp.org/www-community/controls/Content_Security_Policy)
 
-- **Recommendation:**    
-    Implement CSP at HTTP response by adding relevant CSP directives such as `default-src`, `script-src`, `style-src`, `media-src`, and `frame-src`. Set value for each directives with `self` to allow resources from same origin only. Documentation of Content Security Policy can be found at [https://content-security-policy.com/](https://content-security-policy.com/). Detailed implementations may differ depending on what web frameworks and web servers used in the production.
+- **Recommendation:**
+  - Implement CSP at HTTP response by adding relevant CSP directives such as `default-src`, `script-src`, `style-src`, `media-src`, and `frame-src`. Set value for each directives with `self` to allow resources from same origin only. Documentation of Content Security Policy can be found at [https://content-security-policy.com/](https://content-security-policy.com/). Detailed implementations may differ depending on what web frameworks and web servers used in the production.
 
 - **Prevention Strategy:**    
   - Add relevant CSP directives.
