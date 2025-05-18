@@ -39,40 +39,32 @@
 
 ## 3. Detailed Findings
 
-### Content Security Policy (CSP) Header Not Set at ifis.iium.edu.my
+### [Vulnerability Title 1]
 
-**Severity:** Medium  
+- **Severity:** Medium  
+- **Description:**    
+    Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.
 
-**Description:**  
-Content Security Policy (CSP) is a browser security feature designed to prevent cross-site scripting (XSS), clickjacking, and other code injection attacks. CSP allows a website to specify which resources (scripts, styles, images, fonts, etc.) are permitted to load and execute in the browser.
+- **Affected URLs:**    
+    - https://ifis.iium.edu.my
+    - 
 
-**Affected URLs:**  
-- https://ifis.iium.edu.my
+- **Business Impact:**    
+  - Without CSP, malicious actors can inject unauthorized scripts, compromising the integrity and security of the site.
+  - Sensitive user information such as login credentials, personal data, or payment details can be intercepted or stolen due to insufficient content restrictions.
 
-**Business Impact:**
-- **Cross-Site Scripting (XSS) Attack:**  
-  Malicious scripts can be injected into your site to steal user data, cookies, or session tokens.  
-- **Clickjacking:**  
-  Without CSP and related headers, attackers can trick users into clicking hidden buttons or links, causing unintended actions.
+- **OWASP Reference:**    
+    [https://owasp.org/www-community/controls/Content_Security_Policy](https://owasp.org/www-community/controls/Content_Security_Policy)
 
-**OWASP Reference:**  
-[https://owasp.org/www-community/controls/Content_Security_Policy](https://owasp.org/www-community/controls/Content_Security_Policy)
+- **Recommendation:**    
+    Implement CSP at HTTP response by adding relevant CSP directives such as `default-src`, `script-src`, `style-src`, `media-src`, and `frame-src`. Set value for each directives with `self` to allow resources from same origin only. Documentation of Content Security Policy can be found at [https://content-security-policy.com/](https://content-security-policy.com/). Detailed implementations may differ depending on what web frameworks and web servers used in the production.
 
-**Recommendation:**  
-Full documentation and examples on implementing CSP are available at [https://content-security-policy.com](https://content-security-policy.com).  
+- **Prevention Strategy:**    
+    - Add relevant CSP directives.
+    - Set values for each directives with `self`.
+    - Apply regular code reviews and testing.
 
-For example, to block JavaScript scripts from other sources, add the following HTTP response header:
-```
-Content-Security-Policy: script-src 'self'
-```
-This way, attacks such as Cross-Site Scripting and Clickjacking can be blocked. Implementation of CSP may differ depending on what web framework and web servers are used, therefore it is advisable to refer to documentation that is specific to web frameworks and web server used in production.
-
-**Prevention Strategy:**    
-- Add all relevant Content Security Policy directives at the HTTP response such as `default-src`, `script-src`, `style-src`, `media-src` and `frame-src`.
-- Set each directive with the value of `self`. For example, `Content-Security-Policy: script-src 'self'`. This will prevent any other Javascript scripts source from running in the website.
-- Apply regular code reviews and testing.
-
-> **Responsible Team:** Backend developers, Security team, QA  
+> **Responsible Team:** Backend developers, security team, QA    
 > **Target Remediation Date:** 1 June 2025
 
 ---
