@@ -59,10 +59,15 @@
 
 - **Recommendation:**  
   Full documentation and examples on implementing CSP are available at [https://content-security-policy.com](https://content-security-policy.com).  
-  For example, to block JavaScript scripts from other sources, add the following HTTP response header:  
-  ```http
-  Content-Security-Policy: script-src 'self'
+  For example, to block JavaScript scripts from other sources, add the following HTTP response header `Content-Security-Policy: script-src 'self'`. This way, attacks such as Cross-Site Scripting and Clickjacking can be blocked. Implementation of CSP may differs depending on what web framework and web servers are used, therefore it is advisable to refer to documentation that is specific to web frameworks and web server used in production.
 
+- **Prevention Strategy:**    
+    - Add all relevant Content Security Policy directives at the HTTP response such as `default-src`, `script-src`, `style-src`, `media-src` and `frame-src`   
+    - Set each directive with the value of `self`. For example, `Content-Security-Policy: script-src 'self'`. This will prevent any other Javascript scripts source from running in the website.  
+    - Apply regular code reviews and testing.
+
+> **Responsible Team:** Backend developers, Security team, QA  
+> **Target Remediation Date:** 1 June 2025
 
 ---
 
