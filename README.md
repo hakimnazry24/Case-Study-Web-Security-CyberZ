@@ -91,7 +91,7 @@
 
 - **Prevention Strategy:**    
   - Add `frame-ancestor` directive.
-  - Set values for each directives with `none`.
+  - Set value of the directive with `none`.
   - Apply regular code reviews and testing.
 
 > **Responsible Team:** Backend developers, security team, QA   
