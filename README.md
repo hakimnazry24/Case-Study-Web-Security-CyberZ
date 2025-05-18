@@ -39,32 +39,38 @@
 
 ## 3. Detailed Findings
 
-### [Vulnerability Title 1]
+### [Content Security Policy (CSP) Header Not Set At ifis.iium.edu.my]
 
-- **Severity:** [Critical / High / Medium / Low / Info]    
+- **Severity:** Medium    
 - **Description:**    
-    [Short explanation of the issue]
+    Content Security Policy (CSP) is a security feature implemented by web browsers to help prevent cross-site scripting (XSS), clickjacking, and other code injection attacks. It allows a website to control which resources (like scripts, styles, images, fonts, etc.) can be loaded and executed in the browser.
 
 - **Affected URLs:**    
-    - [https://example.com/path1](#)
-    - [https://example.com/path2](#)
+    - https://ifis.iium.edu.my
+    - 
 
 - **Business Impact:**    
-    [Explain potential consequence in non-technical terms.]
+    - **Cross-Site Scripting (XSS) Attack**
+  Malicious scripts can be injected into your site to steal user data, cookies, or session tokens.
+   - **Clickjacking**
+  Without CSP and related headers, attackers can trick users into clicking on hidden buttons or links, performing actions they didn’t intend.
+
 
 - **OWASP Reference:**    
-    [https://owasp.org/www-project-top-ten/](#)
+    https://owasp.org/www-community/controls/Content_Security_Policy
 
 - **Recommendation:**    
-    [Suggested fix, e.g., "Validate user inputs using allow-lists."]
+    Full documentation and examples on how to implement CSP can be found at https://content-security-policy.com. For example, Javascript scripts from other sources can be blocked using CSP by adding the following header into the HTTP response,
+  `Content-Security-Policy: script-src 'self'`. This way, attacks such as Cross-Site Scripting and Clickjacking can be blocked. Implementation of CSP may differs depending on what web framework and web servers are used, therefore it is advisable to refer to documentation that is specific to web frameworks and web server used in production.
+
 
 - **Prevention Strategy:**    
-    - Enforce input validation.
-    - Use secure HTTP headers.
+    - Add all relevant Content Security Policy directives at the HTTP response such as `default-src`, `script-src`, `style-src`, `media-src` and `frame-src`   
+    - Set each directive with the value of `self`. For example, `Content-Security-Policy: script-src 'self'`. This will prevent any other Javascript scripts source from running in the website.
     - Apply regular code reviews and testing.
 
-> **Responsible Team:** [e.g., DevOps]    
-> **Target Remediation Date:** [YYYY-MM-DD]
+> **Responsible Team:** Backend developers, Security team, QA 
+> **Target Remediation Date:** 1 June 2025
 
 ---
 
