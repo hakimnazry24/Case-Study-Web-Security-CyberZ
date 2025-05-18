@@ -39,7 +39,7 @@
 
 ## 3. Detailed Findings
 
-### [Vulnerability Title 1]
+### Content Security Policy (CSP) Header Not Set
 
 - **Severity:** Medium  
 - **Description:**    
