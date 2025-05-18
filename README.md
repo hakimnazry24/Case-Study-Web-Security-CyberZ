@@ -60,8 +60,8 @@
 
 - **Prevention Strategy:**    
   - Add relevant CSP directives.
-   - Set values for each directives with `self`.
-   - Apply regular code reviews and testing.
+  - Set values for each directives with `self`.
+  - Apply regular code reviews and testing.
 
 > **Responsible Team:** Backend developers, security team, QA    
 > **Target Remediation Date:** 1 June 2025
