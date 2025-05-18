@@ -48,7 +48,7 @@
 - **Affected URLs:**  
   - https://ifis.iium.edu.my
 
-- **Business Impact:**  
+- **Business Impact:**
   - **Cross-Site Scripting (XSS) Attack:**  
     Malicious scripts can be injected into your site to steal user data, cookies, or session tokens.  
   - **Clickjacking:**  
@@ -62,9 +62,9 @@
   For example, to block JavaScript scripts from other sources, add the following HTTP response header `Content-Security-Policy: script-src 'self'`. This way, attacks such as Cross-Site Scripting and Clickjacking can be blocked. Implementation of CSP may differs depending on what web framework and web servers are used, therefore it is advisable to refer to documentation that is specific to web frameworks and web server used in production.
 
 - **Prevention Strategy:**    
-    - Add all relevant Content Security Policy directives at the HTTP response such as `default-src`, `script-src`, `style-src`, `media-src` and `frame-src`   
-      - Set each directive with the value of `self`. For example, `Content-Security-Policy: script-src 'self'`. This will prevent any other Javascript scripts source from running in the website.  
-      - Apply regular code reviews and testing.
+  - Add all relevant Content Security Policy directives at the HTTP response such as `default-src`, `script-src`, `style-src`, `media-src` and `frame-src`.   
+   - Set each directive with the value of `self`. For example, `Content-Security-Policy: script-src 'self'`. This will prevent any other Javascript scripts source from running in the website.  
+    - Apply regular code reviews and testing.
 
 > **Responsible Team:** Backend developers, Security team, QA  
 > **Target Remediation Date:** 1 June 2025
