@@ -59,9 +59,9 @@
     Implement CSP at HTTP response by adding relevant CSP directives such as `default-src`, `script-src`, `style-src`, `media-src`, and `frame-src`. Set value for each directives with `self` to allow resources from same origin only. Documentation of Content Security Policy can be found at [https://content-security-policy.com/](https://content-security-policy.com/). Detailed implementations may differ depending on what web frameworks and web servers used in the production.
 
 - **Prevention Strategy:**    
-    - Add relevant CSP directives.
-    - Set values for each directives with `self`.
-    - Apply regular code reviews and testing.
+  - Add relevant CSP directives.
+   - Set values for each directives with `self`.
+   - Apply regular code reviews and testing.
 
 > **Responsible Team:** Backend developers, security team, QA    
 > **Target Remediation Date:** 1 June 2025
