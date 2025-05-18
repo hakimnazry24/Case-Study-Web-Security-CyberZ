@@ -68,6 +68,35 @@
 
 ---
 
+### Missing Anti-clickjacking Header
+
+- **Severity:** Medium  
+- **Description:**
+  - The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options. With the `frame-ancestor` directive, it disallows the site from being displayed in a frame
+
+- **Affected URLs:**
+  - [https://ifis.iium.edu.my](https://ifis.iium.edu.my) 
+
+- **Business Impact:**    
+  - **Clickjacking Attack**
+    Attackers can embed the site in an invisible <iframe> and tricks users into clicking buttons or links while thinking they are interacting with something else.
+  - **Phishing & Brand Abuse**
+    Malicious actors can embed site within deceptive pages, making it appears as if the content is legit.
+
+- **OWASP Reference:**
+  - [https://owasp.org/www-community/attacks/Clickjacking](https://owasp.org/www-community/attacks/Clickjacking) 
+
+- **Recommendation:**
+  - Add `frame-ancestor` Content Security Policy directive and set it to `none` to prevent the site from becoming framable. Implementation may differ depending on web frameworks and web servers used.
+
+- **Prevention Strategy:**    
+  - Add `frame-ancestor` directive.
+  - Set values for each directives with `none`.
+  - Apply regular code reviews and testing.
+
+> **Responsible Team:** Backend developers, security team, QA   
+> **Target Remediation Date:** 1 June 2025
+
 (Repeat for each major vulnerability)
 
 ---
