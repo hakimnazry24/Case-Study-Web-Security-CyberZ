@@ -268,8 +268,8 @@ Configure the server to suppress debug error messages in production. Display onl
 - Scan configuration details
 - **Sites Scanned**:    
 - https://studentrepo.iium.edu.my  
-- http://studentrepo.iium.edu.my    
-*Total Alerts Analyzed:* 11
+- http://studentrepo.iium.edu.my
+  *Total Alerts Analyzed:* 11
 
 ---
 
