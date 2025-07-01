@@ -17,8 +17,8 @@
 | Critical Issues                              | [0]                    |
 | High-Risk Issues                            | [0]                    |
 | Medium-Risk Issues                        | [4]                    |
-| Low-Risk/Informational Issues | [Count]                    |
-| Remediation Status                        | [Pending/In Progress/Complete] |
+| Low-Risk/Informational Issues | [0]                    |
+| Remediation Status                        | [Pending] |
 
 **Key Takeaway:**    
 [Brief overview: e.g., "The scan identified 2 high-risk vulnerabilities that require immediate attention. No critical issues were found."]
@@ -97,6 +97,7 @@
 > **Responsible Team:** Backend developers, security team, QA   
 > **Target Remediation Date:** 1 June 2025
 
+---
 
 
 ###  Content Security Policy (CSP) Header Not Set  
