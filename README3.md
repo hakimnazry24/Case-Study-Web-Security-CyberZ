@@ -3,7 +3,7 @@
 **Tool Used:** OWASP ZAP  
 **Date of Scan:** 2025-06-27  
 **Scanned By:** [CyberZ]  
-**Target Application:** http://ifis.iium.edu.my/online  
+**Target Application:** http://ifis.iium.edu.my/online, https://ifis.iium.edu.my , http://studentrepo.iium.edu.my 
 **Scan Type:** Active   
 **Scan Duration:** Not specified  
 
@@ -97,7 +97,6 @@
 
 ---
 
----
 
 ###  Content Security Policy (CSP) Header Not Set  
 **Severity:** Medium  
