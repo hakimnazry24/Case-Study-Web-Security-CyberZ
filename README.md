@@ -97,6 +97,8 @@
 > **Responsible Team:** Backend developers, security team, QA   
 > **Target Remediation Date:** 1 June 2025
 
+
+
 ###  Content Security Policy (CSP) Header Not Set  
 **Severity:** Medium  
 **Confidence:** High  
@@ -266,7 +268,7 @@ Configure the server to suppress debug error messages in production. Display onl
 - **Sites Scanned**:    
 - https://studentrepo.iium.edu.my  
 - http://studentrepo.iium.edu.my    
-**Total Alerts Analyzed:** 11
+*Total Alerts Analyzed:* 11
 
 ---
 
