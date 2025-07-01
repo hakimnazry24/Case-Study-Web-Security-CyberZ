@@ -25,12 +25,12 @@
 
 ## 2. Summary of Findings
 
-| Risk Level | Number of Issues | Example Vulnerability                     |
+| Risk Level | Number of Issues | Example Vulnerability                    |
 |------------|------------------|------------------------------------------|
 | Critical   | 0                | -                                        |
 | High       | 0                | -                                        |
-| Medium     | 2               | Absence of Anti-CSRF Tokens, Content Security Policy (CSP) Header Not Set |
-| Low        | 3                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
+| Medium     | 6                | Absence of Anti-CSRF Tokens, Content Security Policy (CSP) Header Not Set |
+| Low        | 10                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
 | Info       | 1                | Session Management Response Identified |
 
 ---
