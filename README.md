@@ -110,7 +110,7 @@ Without CSP, browsers will load resources from any origin, increasing the risk o
 Add a CSP header with directives like default-src, script-src, style-src, etc., to restrict the sources of content.  
 **OWASP Reference:** https://owasp.org/www-community/controls/Content_Security_Policy  
 **Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 July 2025
+**Target Remediation Date:** 1 June 2025
 
 ---
 
@@ -126,7 +126,7 @@ The risk of information disclosure is dramatically increased when the target sit
 Use a vetted library or framework that does not allow this weakness to occur or provides constructs that make this weakness easier to avoid. For example, use anti-CSRF packages such as the OWASP CSRFGuard.  
 **OWASP Reference:** https://owasp.org/www-community/attacks/csrf  
 **Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 July 2025
+**Target Remediation Date:** 1 June 2025
 
 ---
 
@@ -142,7 +142,7 @@ Malicious script can be run on this page then the cookie will be accessible and 
 Ensure that the HttpOnly flag is set for all cookies.  
 **OWASP Reference:** https://owasp.org/www-community/HttpOnly  
 **Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 July 2025
+**Target Remediation Date:** 1 June 2025
 
 ---
 
@@ -158,7 +158,7 @@ Attackers can perform unauthorized actions on behalf of authenticated users, lea
 Ensure that the SameSite attribute is set to either 'lax' or ideally 'strict' for all cookies.  
 **OWASP Reference:** https://owasp.org/www-community/SameSite  
 **Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 July 2025
+**Target Remediation Date:** 1 June 2025
 
 ---
 
@@ -174,7 +174,7 @@ Facilitates fingerprinting attacks and exploitation of known vulnerabilities.
 Configure server to hide version info in the response headers.  
 **OWASP Reference:** https://owasp.org/www-project-secure-headers/  
 **Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 July 2025
+**Target Remediation Date:** 1 June 2025
 
 ---
 
