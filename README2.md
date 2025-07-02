@@ -137,7 +137,7 @@ When visiting any route, your app should respond with a CSP header like:
 
 ---
 
-### 🛡️ Missing Anti-clickjacking Header
+### Missing Anti-clickjacking Header
 
 **Severity:** Medium\
 **Confidence:** Medium
