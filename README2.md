@@ -63,41 +63,27 @@ Implement a strict but functional Content Security Policy that defines the allow
 
 **Approach:** Use [`spatie/laravel-csp`](https://github.com/spatie/laravel-csp) to enforce a CSP via middleware in Laravel.
 
-* * * * *
-
 **Step 1: Install CSP package**
-
-bash
-
-CopyEdit
 
 `composer require spatie/laravel-csp`
 
 This package simplifies the process of adding CSP headers by allowing policy-based definitions.
 
-* * * * *
 
 **Step 2: Publish the configuration file**
 
-bash
-
-CopyEdit
 
 `php artisan vendor:publish --provider="Spatie\Csp\CspServiceProvider"`
 
 This generates the config file:\
 📄 `config/csp.php`
 
-* * * * *
 
 **Step 3: Create a custom CSP policy**\
 Create this file:\
 📄 `app/Csp/CustomPolicy.php`
 
-php
-
-CopyEdit
-
+***php
 `namespace App\Csp;
 
 use Spatie\Csp\Policies\Policy;
@@ -116,28 +102,23 @@ class CustomPolicy extends Policy
             ->addDirective(Directive::CONNECT_SRC, [Keyword::SELF]);
     }
 }`
-
+***
 > This policy restricts most resource loading to the same origin (`'self'`), with specific exceptions (e.g., CDNs).
 
-* * * * *
 
 **Step 4: Register your policy in the config**\
 Open `config/csp.php` and set the custom policy:
 
 php
 
-CopyEdit
-
 `'policy' => App\Csp\CustomPolicy::class,`
 
-* * * * *
 
 **Step 5: Register the middleware**\
 In `app/Http/Kernel.php`, register the middleware globally by adding:
 
 php
 
-CopyEdit
 
 `\Spatie\Csp\AddCspHeaders::class,`
 
@@ -145,19 +126,13 @@ to the `$middleware` array.
 
 This middleware will automatically inject the `Content-Security-Policy` header into every HTTP response.
 
-* * * * *
 
 **Expected Result:**\
 When visiting any route, your app should respond with a CSP header like:
 
-pgsql
-
-CopyEdit
-
 `Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; img-src 'self' data:; connect-src 'self'`
 
 You can view this in your browser's Developer Tools → **Network tab** → click any request → **Headers**.
-
 ---
 
 ###  Missing Anti-clickjacking Header  
