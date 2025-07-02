@@ -3,7 +3,7 @@
 **Tool Used:** OWASP ZAP  
 **Date of Scan:** 2025-06-27  
 **Scanned By:** [CyberZ]  
-**Target Application:** http://ifis.iium.edu.my/online, https://ifis.iium.edu.my , http://studentrepo.iium.edu.my.
+**Target Application:** http://studentrepo.iium.edu.my.
 **Scan Type:** Active   
 **Scan Duration:** ~2 minutes  
 
@@ -13,13 +13,13 @@
 
 | Metric                          | Value                                     |
 |--------------------------------|-------------------------------------------|
-| Total Issues Identified        | 17                                        |
+| Total Issues Identified        | 9                                        |
 | Critical Issues                | 0                                         |
 | High-Risk Issues               | 0                                         |
-| Medium-Risk Issues             | 6                                         |
-| Low-Risk/Informational Issues | 11                                         |
+| Medium-Risk Issues             | 2                                         |
+| Low-Risk/Informational Issues | 7                                         |
 | Remediation Status             | Pending                                   |
-| Key Takeaway                   | The scan found no critical or high-risk issues. However, 4 medium-risk and several low-risk issues were identified. CSP header is notably missing and should be prioritized. |
+| Key Takeaway                   | The scan found no critical or high-risk issues. However, 2 medium-risk and several low-risk issues were identified. CSP header is notably missing and should be prioritized. |
 
 ---
 
@@ -29,30 +29,134 @@
 |------------|------------------|------------------------------------------|
 | Critical   | 0                | -                                        |
 | High       | 0                | -                                        |
-| Medium     | 6                | Absence of Anti-CSRF Tokens, Content Security Policy (CSP) Header Not Set |
-| Low        | 11                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
-| Info       | 1                | Session Management Response Identified |
+| Medium     | 2                | Absence of Anti-CSRF Tokens, Content Security Policy (CSP) Header Not Set |
+| Low        | 7                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
+| Info       | 0                | -                                        |
 
 ---
 
 ## 3. Detailed Findings
 
-###  Content Security Policy (CSP) Header Not Set  
-**Severity:** Medium  
-**Confidence:** High  
+✅ [CSP Specific] - Content Security Policy Related Only
+### Content Security Policy (CSP) Header Not Set
 
-**Description:**  
-The application does not implement a Content Security Policy (CSP) header, which helps mitigate attacks like Cross-Site Scripting (XSS).  
-**Affected URL:** http://studentrepo.iium.edu.my  
+**Severity:** Medium\
+**Confidence:** High
 
-**Business Impact:**  
-Without CSP, browsers will load resources from any origin, increasing the risk of script injection attacks.
+**Description:**\
+The application does not include a `Content-Security-Policy` (CSP) HTTP header. This header helps prevent various injection attacks such as **Cross-Site Scripting (XSS)** by specifying which sources the browser should trust to load content (e.g., scripts, styles, images).
 
-**Recommendation:**  
-Add a CSP header with directives like default-src, script-src, style-src, etc., to restrict the sources of content.  
-**OWASP Reference:** https://owasp.org/www-community/controls/Content_Security_Policy  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
+**Affected URL:** <http://studentrepo.iium.edu.my>
+
+**Business Impact:**\
+Without a CSP, modern browsers will load JavaScript, stylesheets, images, and other resources from **any origin**. This increases the risk of malicious content being injected or loaded from untrusted sources --- especially dangerous if the app is vulnerable to reflected or stored XSS.
+
+**Recommendation:**\
+Implement a strict but functional Content Security Policy that defines the allowed sources for different types of content (e.g., `script-src`, `style-src`, `img-src`). This significantly reduces the impact of XSS and similar attacks by **limiting what gets executed in the browser**.
+
+**OWASP Reference:**\
+<https://owasp.org/www-community/controls/Content_Security_Policy>
+
+* * * * *
+
+#### 🛠️ Remediation Steps for Developers
+
+**Approach:** Use [`spatie/laravel-csp`](https://github.com/spatie/laravel-csp) to enforce a CSP via middleware in Laravel.
+
+* * * * *
+
+**Step 1: Install CSP package**
+
+bash
+
+CopyEdit
+
+`composer require spatie/laravel-csp`
+
+This package simplifies the process of adding CSP headers by allowing policy-based definitions.
+
+* * * * *
+
+**Step 2: Publish the configuration file**
+
+bash
+
+CopyEdit
+
+`php artisan vendor:publish --provider="Spatie\Csp\CspServiceProvider"`
+
+This generates the config file:\
+📄 `config/csp.php`
+
+* * * * *
+
+**Step 3: Create a custom CSP policy**\
+Create this file:\
+📄 `app/Csp/CustomPolicy.php`
+
+php
+
+CopyEdit
+
+`namespace App\Csp;
+
+use Spatie\Csp\Policies\Policy;
+use Spatie\Csp\Directive;
+use Spatie\Csp\Keyword;
+
+class CustomPolicy extends Policy
+{
+    public function configure()
+    {
+        $this
+            ->addDirective(Directive::DEFAULT_SRC, [Keyword::SELF])
+            ->addDirective(Directive::SCRIPT_SRC, [Keyword::SELF, 'https://cdnjs.cloudflare.com'])
+            ->addDirective(Directive::STYLE_SRC, [Keyword::SELF, 'https://fonts.googleapis.com'])
+            ->addDirective(Directive::IMG_SRC, [Keyword::SELF, 'data:']) // allow base64 images
+            ->addDirective(Directive::CONNECT_SRC, [Keyword::SELF]);
+    }
+}`
+
+> This policy restricts most resource loading to the same origin (`'self'`), with specific exceptions (e.g., CDNs).
+
+* * * * *
+
+**Step 4: Register your policy in the config**\
+Open `config/csp.php` and set the custom policy:
+
+php
+
+CopyEdit
+
+`'policy' => App\Csp\CustomPolicy::class,`
+
+* * * * *
+
+**Step 5: Register the middleware**\
+In `app/Http/Kernel.php`, register the middleware globally by adding:
+
+php
+
+CopyEdit
+
+`\Spatie\Csp\AddCspHeaders::class,`
+
+to the `$middleware` array.
+
+This middleware will automatically inject the `Content-Security-Policy` header into every HTTP response.
+
+* * * * *
+
+**Expected Result:**\
+When visiting any route, your app should respond with a CSP header like:
+
+pgsql
+
+CopyEdit
+
+`Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; img-src 'self' data:; connect-src 'self'`
+
+You can view this in your browser's Developer Tools → **Network tab** → click any request → **Headers**.
 
 ---
 
@@ -68,11 +172,10 @@ Leaves application vulnerable to clickjacking.
 **Recommendation:**  
 Add appropriate CSP directive or X-Frame-Options header.  
 **OWASP Reference:** https://owasp.org/www-community/attacks/Clickjacking  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
+
 
 ---
-
+🔐 [Header Security] - Missing Security Headers
 ###  Server Leaks Information via 'X-Powered-By' HTTP Header  
 **Severity:** Low  
 **Confidence:** Medium  
@@ -85,8 +188,7 @@ Attackers can target known vulnerabilities of disclosed technologies.
 **Recommendation:**  
 Remove or obfuscate the 'X-Powered-By' header.  
 **OWASP Reference:** https://owasp.org/www-community/attacks/Information_exposure_through_HTTP_headers  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
+
 
 ---
 
@@ -102,8 +204,6 @@ Facilitates fingerprinting attacks and exploitation of known vulnerabilities.
 **Recommendation:**  
 Configure server to hide version info in the response headers.  
 **OWASP Reference:** https://owasp.org/www-project-secure-headers/  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
 
 ---
 
@@ -119,8 +219,7 @@ Users may be vulnerable to SSL stripping attacks if they initially connect over 
 **Recommendation:**  
 Add the HSTS header to enforce HTTPS connections.  
 **OWASP Reference:** https://owasp.org/www-project-secure-headers/#strict-transport-security  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
+
 
 ---
 
@@ -136,11 +235,10 @@ Could lead to script execution in the wrong context, risking XSS.
 **Recommendation:**  
 Set `X-Content-Type-Options: nosniff` on all responses.  
 **OWASP Reference:** https://owasp.org/www-project-secure-headers/#x-content-type-options  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
+
 
 ---
-
+[Information Disclosure] - Error Messages & Internal Info
 ###  Application Error Disclosure  
 **Severity:** Low  
 **Confidence:** Medium  
@@ -153,25 +251,6 @@ Could provide attackers with information about the app’s internal structure or
 **Recommendation:**  
 Suppress detailed error messages in production environments and log them securely.  
 **OWASP Reference:** https://owasp.org/www-community/Improper_Error_Handling  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
-
----
-
-###  Cookie with SameSite Attribute None  
-**Severity:** Low  
-**Confidence:** Medium  
-**Description:**  
-Cookies are set with `SameSite=None` which may expose them to cross-site request forgery attacks.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Could lead to CSRF attacks if cookies are sent cross-site without secure validation. 
-
-**Recommendation:**  
-Set the `SameSite` attribute to `Lax` or `Strict` depending on your application's requirements.  
-**OWASP Reference:** https://owasp.org/www-community/controls/SameSite  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
 
 ---
 
@@ -187,13 +266,24 @@ Exposes information such as file paths, server errors, or code stack traces that
 **Recommendation:**  
 Configure the server to suppress debug error messages in production. Display only user-friendly error pages.  
 **OWASP Reference:** https://owasp.org/www-community/Improper_Error_Handling  
-**Responsible Team:** Backend Developers  
-**Target Remediation Date:** 1 June 2025
 
 ---
+🍪 [Cookie Security]
+###  Cookie with SameSite Attribute None  
+**Severity:** Low  
+**Confidence:** Medium  
+**Description:**  
+Cookies are set with `SameSite=None` which may expose them to cross-site request forgery attacks.  
+**Affected URL:** http://studentrepo.iium.edu.my  
+**Business Impact:**  
+Could lead to CSRF attacks if cookies are sent cross-site without secure validation. 
+
+**Recommendation:**  
+Set the `SameSite` attribute to `Lax` or `Strict` depending on your application's requirements.  
+**OWASP Reference:** https://owasp.org/www-community/controls/SameSite  
 
 
-
+---
 
 ## 4. Recommendations & Next Steps
 
@@ -206,12 +296,7 @@ Configure the server to suppress debug error messages in production. Display onl
 ---
 
 ## Appendix
-
 - **Sites Scanned**:
-  - https://ifis.iium.edu.my 
-  - http://ifis.iium.edu.my/online 
-  - https://ifis.iium.edu.my/robots.txt
-  - https://ifis.iium.edu.my/sitemap.xml
   - http://studentrepo.iium.edu.my 
 - **ZAP Version:** 2.16.1  
 - **Total Alerts Analyzed:** 17
