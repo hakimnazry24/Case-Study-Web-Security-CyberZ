@@ -181,6 +181,7 @@ If your application legitimately needs to be embedded (e.g., in your own domain)
 `$this->addDirective(Directive::FRAME_ANCESTORS, ["'self'"]);`
 
 **Step 2: No further steps required**\
+
 The middleware is already active from the CSP setup. The new directive will be included in the existing `Content-Security-Policy` header automatically.
 
 **Expected Result:**\
@@ -188,7 +189,8 @@ Response header now includes:
 
 `Content-Security-Policy: frame-ancestors 'none';`
 
-This prevents the page from being displayed in any iframe, stopping clickjacking.
+- This prevents the page from being displayed in any iframe, stopping clickjacking.
+
 ---
 
 ###  Server Leaks Version Information via 'Server' HTTP Header  
