@@ -5,7 +5,7 @@
 **Scanned By:** [CyberZ]  
 **Target Application:** http://ifis.iium.edu.my/online, https://ifis.iium.edu.my , http://studentrepo.iium.edu.my.
 **Scan Type:** Active   
-**Scan Duration:** Not specified  
+**Scan Duration:** ~2 minutes  
 
 ---
 
