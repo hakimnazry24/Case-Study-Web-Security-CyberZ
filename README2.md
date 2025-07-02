@@ -83,9 +83,10 @@ This generates the config file:\
 Create this file:\
 📄 `app/Csp/CustomPolicy.php`
 
-***php
-`namespace App\Csp;
 
+```
+php
+namespace App\Csp;
 use Spatie\Csp\Policies\Policy;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
@@ -101,8 +102,10 @@ class CustomPolicy extends Policy
             ->addDirective(Directive::IMG_SRC, [Keyword::SELF, 'data:']) // allow base64 images
             ->addDirective(Directive::CONNECT_SRC, [Keyword::SELF]);
     }
-}`
-***
+}
+```
+
+
 > This policy restricts most resource loading to the same origin (`'self'`), with specific exceptions (e.g., CDNs).
 
 
