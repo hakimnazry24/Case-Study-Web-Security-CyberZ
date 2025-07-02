@@ -13,13 +13,13 @@
 
 | Metric                          | Value                                     |
 |--------------------------------|-------------------------------------------|
-| Total Issues Identified        | 17                                        |
+| Total Issues Identified        | 18                                        |
 | Critical Issues                | 0                                         |
 | High-Risk Issues               | 0                                         |
 | Medium-Risk Issues             | 6                                         |
-| Low-Risk/Informational Issues | 11                                         |
+| Low-Risk/Informational Issues | 12                                         |
 | Remediation Status             | Pending                                   |
-| Key Takeaway                   | The scan found no critical or high-risk issues. However, 4 medium-risk and several low-risk issues were identified. CSP header is notably missing and should be prioritized. |
+| Key Takeaway                   | The scan found no critical or high-risk issues. However, 6 medium-risk and several low-risk issues were identified. CSP header is notably missing and should be prioritized. |
 
 ---
 
