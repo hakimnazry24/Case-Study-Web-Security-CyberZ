@@ -30,7 +30,7 @@
 | Critical   | 0                | -                                        |
 | High       | 0                | -                                        |
 | Medium     | 6                | Absence of Anti-CSRF Tokens, Content Security Policy (CSP) Header Not Set |
-| Low        | 10                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
+| Low        | 11                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
 | Info       | 1                | Session Management Response Identified |
 
 ---
@@ -45,6 +45,8 @@
 
 - **Affected URLs:**
   - https://ifis.iium.edu.my
+  - https://ifis.iium.edu.my/robots.txt
+  - https://ifis.iium.edu.my/sitemap.xml
 
 - **Business Impact:**    
   - Without CSP, malicious actors can inject unauthorized scripts, compromising the integrity and security of the site.
@@ -91,6 +93,38 @@
   - Add `frame-ancestor` directive for the Content Security Policy.
   - Set value of the directive with `none`.
   - Apply regular code reviews and testing.
+
+> **Responsible Team:** Backend developers, security team, QA   
+> **Target Remediation Date:** 1 June 2025
+
+---
+
+### Server Leaks Version Information via "Server" HTTP Response Header Field
+
+- **Severity:** Low 
+- **Description:**
+  - The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.
+
+- **Affected URLs:**
+  - [https://ifis.iium.edu.my](https://ifis.iium.edu.my) 
+
+- **Business Impact:**    
+  - Helps attackers identify specific software and version, making targeted exploits easier.
+  - Increases the risk of automated attacks using known vulnerabilities.
+  - May lead to full system compromise if known exploits are available for the disclosed version.
+
+- **OWASP Reference:**
+  - [https://owasp.org/www-project-secure-headers/](https://owasp.org/www-project-secure-headers/) 
+
+- **Recommendation:**
+  - Configure the web server to either remove the "Server" HTTP response header entirely or replace it with a generic value (e.g., "Web Server") to prevent disclosing detailed version information that could aid attackers in identifying and exploiting known vulnerabilities.
+
+- **Prevention Strategy:**    
+  - Disable or modify the "Server" header in the web server configuration (e.g., Apache, Nginx, IIS).
+  - Use a reverse proxy (like Nginx or HAProxy) to strip or overwrite response headers.
+  - Regularly update and patch web server software to reduce risk even if version info is exposed.
+  - Conduct security scans to detect unintentional header exposures.
+Implement security headers using a Web Application Firewall (WAF) or middleware solutions.
 
 > **Responsible Team:** Backend developers, security team, QA   
 > **Target Remediation Date:** 1 June 2025
