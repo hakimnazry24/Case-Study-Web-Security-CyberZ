@@ -39,24 +39,24 @@
 
 ### Content Security Policy (CSP) Header Not Set
 
-- **Severity:** Medium  
-- **Description:**  
+**Severity:** Medium  
+**Description:**  
 Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.
-- **Affected URLs:**
-  - https://ifis.iium.edu.my
-  - https://ifis.iium.edu.my/robots.txt
-  - https://ifis.iium.edu.my/sitemap.xml
-- **Business Impact:**    
-  - Without CSP, malicious actors can inject unauthorized scripts, compromising the integrity and security of the site.
-  - Sensitive user information such as login credentials, personal data, or payment details can be intercepted or stolen due to insufficient content restrictions.
-- **OWASP Reference:**    
-    [https://owasp.org/www-community/controls/Content_Security_Policy](https://owasp.org/www-community/controls/Content_Security_Policy)
-- **Recommendation:**  
+**Affected URLs:**
+- https://ifis.iium.edu.my
+- https://ifis.iium.edu.my/robots.txt
+- https://ifis.iium.edu.my/sitemap.xml
+**Business Impact:**    
+- Without CSP, malicious actors can inject unauthorized scripts, compromising the integrity and security of the site.
+- Sensitive user information such as login credentials, personal data, or payment details can be intercepted or stolen due to insufficient content restrictions.
+**OWASP Reference:**    
+[https://owasp.org/www-community/controls/Content_Security_Policy](https://owasp.org/www-community/controls/Content_Security_Policy)
+**Recommendation:**  
 Implement CSP at HTTP response by adding relevant CSP directives such as `default-src`, `script-src`, `style-src`, `media-src`, and `frame-src`. Set value for each directives with `self` to allow resources from same origin only. Documentation of Content Security Policy can be found at [https://content-security-policy.com/](https://content-security-policy.com/). Detailed implementations may differ depending on what web frameworks and web servers used in the production.
-- **Prevention Strategy:**    
-  - Add relevant CSP directives.
-  - Set values for each directives with `self`.
-  - Apply regular code reviews and testing.
+**Prevention Strategy:**    
+- Add relevant CSP directives.
+- Set values for each directives with `self`.
+- Apply regular code reviews and testing.
 > **Responsible Team:** Backend developers, security team, QA   
 > **Target Remediation Date:** 1 June 2025
 
@@ -64,23 +64,23 @@ Implement CSP at HTTP response by adding relevant CSP directives such as `defaul
 
 ### Missing Anti-clickjacking Header
 
-- **Severity:** Medium  
-- **Description:**  
+**Severity:** Medium  
+**Description:**  
 The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options. With the `frame-ancestor` directive, it disallows the site from being displayed in a frame
-- **Affected URLs:**
-  - [https://ifis.iium.edu.my](https://ifis.iium.edu.my) 
-- **Business Impact:**    
-  - **Clickjacking Attack**
+**Affected URLs:**
+- [https://ifis.iium.edu.my](https://ifis.iium.edu.my) 
+**Business Impact:**    
+- **Clickjacking Attack**
     Attackers can embed the site in an invisible <iframe> and tricks users into clicking buttons or links while thinking they are interacting with something else.
-  - **Phishing & Brand Abuse**
+- **Phishing & Brand Abuse**
     Malicious actors can embed site within deceptive pages, making it appears as if the content is legit.
-- **OWASP Reference:**  [https://owasp.org/www-community/attacks/Clickjacking](https://owasp.org/www-community/attacks/Clickjacking) 
-- **Recommendation:**
-- Add `frame-ancestor` Content Security Policy directive and set it to `none` to prevent the site from becoming framable. Implementation may differ depending on web frameworks and web servers used.
-- **Prevention Strategy:**    
-  - Add `frame-ancestor` directive for the Content Security Policy.
-  - Set value of the directive with `none`.
-  - Apply regular code reviews and testing.
+**OWASP Reference:**  [https://owasp.org/www-community/attacks/Clickjacking](https://owasp.org/www-community/attacks/Clickjacking) 
+**Recommendation:**
+Add `frame-ancestor` Content Security Policy directive and set it to `none` to prevent the site from becoming framable. Implementation may differ depending on web frameworks and web servers used.
+**Prevention Strategy:**    
+- Add `frame-ancestor` directive for the Content Security Policy.
+- Set value of the directive with `none`.
+- Apply regular code reviews and testing.
 
 > **Responsible Team:** Backend developers, security team, QA   
 > **Target Remediation Date:** 1 June 2025
@@ -88,18 +88,17 @@ The response does not protect against 'ClickJacking' attacks. It should include 
 ---
 
 ### Server Leaks Version Information via "Server" HTTP Response Header Field
-
-- **Severity:** Low 
-- **Description:**  
+**Severity:** Low 
+**Description:**  
 The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.
-- **Affected URLs:**
-  - [https://ifis.iium.edu.my](https://ifis.iium.edu.my) 
-- **Business Impact:**    
-  - Helps attackers identify specific software and version, making targeted exploits easier.
-  - Increases the risk of automated attacks using known vulnerabilities.
-  - May lead to full system compromise if known exploits are available for the disclosed version.
-- **OWASP Reference:** [https://owasp.org/www-project-secure-headers/](https://owasp.org/www-project-secure-headers/) 
-- **Recommendation:**  
+**Affected URLs:**
+- [https://ifis.iium.edu.my](https://ifis.iium.edu.my) 
+**Business Impact:**    
+- Helps attackers identify specific software and version, making targeted exploits easier.
+- Increases the risk of automated attacks using known vulnerabilities.
+- May lead to full system compromise if known exploits are available for the disclosed version.
+**OWASP Reference:** [https://owasp.org/www-project-secure-headers/](https://owasp.org/www-project-secure-headers/) 
+**Recommendation:**  
 Configure the web server to either remove the "Server" HTTP response header entirely or replace it with a generic value (e.g., "Web Server") to prevent disclosing detailed version information that could aid attackers in identifying and exploiting known vulnerabilities.
 - **Prevention Strategy:**    
   - Disable or modify the "Server" header in the web server configuration (e.g., Apache, Nginx, IIS).
