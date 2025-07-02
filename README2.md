@@ -57,7 +57,7 @@ Implement a strict but functional Content Security Policy that defines the allow
 **OWASP Reference:**\
 <https://owasp.org/www-community/controls/Content_Security_Policy>
 
-* * * * *
+
 
 #### 🛠️ Remediation Steps for Developers
 
@@ -162,7 +162,6 @@ To prevent this, restrict iframe embedding by either:
 **OWASP Reference:**\
 <https://owasp.org/www-community/attacks/Clickjacking>
 
-* * * * *
 
 #### 🛠️ Remediation Steps for Developers
 
@@ -192,50 +191,341 @@ Response header now includes:
 - This prevents the page from being displayed in any iframe, stopping clickjacking.
 
 ---
+1.
+###  X-Content-Type-Options Header Missing
 
-###  Server Leaks Version Information via 'Server' HTTP Header  
-**Severity:** Low  
-**Confidence:** High  
-**Description:**  
-The 'Server' header discloses the web server version used by the application.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Facilitates fingerprinting attacks and exploitation of known vulnerabilities.  
+**Severity:** Low\
+**Confidence:** Medium\
+**Affected URL:** `http://studentrepo.iium.edu.my`
 
-**Recommendation:**  
-Configure server to hide version info in the response headers.  
-**OWASP Reference:** https://owasp.org/www-project-secure-headers/  
+
+#### Description:
+
+The application does not include the `X-Content-Type-Options` HTTP header. Without it, browsers are allowed to perform MIME-type sniffing, potentially interpreting files as a different MIME type than declared.
+
+
+#### Business Impact:
+
+If an attacker uploads a file with a misleading extension (e.g., `.txt` or `.jpg`) but with malicious JavaScript inside, and the browser "sniffs" and treats it as a script, it could lead to **script execution in the wrong context** --- increasing the risk of XSS and client-side attacks.
+
+
+
+####  Recommendation:
+
+Set the following HTTP header on all responses:
+
+
+`X-Content-Type-Options: nosniff`
+
+This prevents the browser from guessing the MIME type, forcing it to follow the server-declared `Content-Type`.
+
+
+**OWASP Reference:**\
+🔗 <https://owasp.org/www-project-secure-headers/#x-content-type-options>
+
+
+### 🛠️ Remediation in Laravel
+
+#### Step 1: Create Middleware
+
+`php artisan make:middleware AddSecurityHeaders`
+
+File generated at:
+
+`app/Http/Middleware/AddSecurityHeaders.php`
+
+
+#### Step 2: Add the Header Logic
+
+
+
+```
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class AddSecurityHeaders
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = $next($request);
+
+        // Prevent MIME-type sniffing by browser
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+
+        return $response;
+    }
+}
+```
+
+
+#### Step 3: Register the Middleware Globally
+
+In `app/Http/Kernel.php`, add to the `$middleware` array:
+
+
+`\App\Http\Middleware\AddSecurityHeaders::class,`
+
+
+#### ✅ Result:
+
+Every response will now include:
+
+`X-Content-Type-Options: nosniff`
+
+-You can verify this by inspecting HTTP response headers in browser dev tools → **Network tab → Headers**.
 
 ---
 
-###  Strict-Transport-Security Header Not Set  
-**Severity:** Low  
-**Confidence:** High  
-**Description:**  
-The Strict-Transport-Security header is not set, which means users might access the site over an insecure connection.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Users may be vulnerable to SSL stripping attacks if they initially connect over HTTP.  
+2.
+###  Strict-Transport-Security Header Not Set
 
-**Recommendation:**  
-Add the HSTS header to enforce HTTPS connections.  
-**OWASP Reference:** https://owasp.org/www-project-secure-headers/#strict-transport-security  
+**Severity:** Low\
+**Confidence:** High\
+**Affected URL:** `http://studentrepo.iium.edu.my`
 
+
+
+####  Description:
+
+The application does not return the `Strict-Transport-Security` (HSTS) HTTP header. This header is used to tell browsers that the site should only be accessed over **secure HTTPS connections**, and to prevent any attempts to downgrade to HTTP.
+
+
+
+#### Business Impact:
+
+Without the HSTS header:
+
+-   Users might connect over **insecure HTTP** if they manually type the URL or click a non-HTTPS link.
+
+-   This leaves users vulnerable to **SSL stripping attacks**, where attackers intercept and downgrade the connection to plaintext.
+
+
+
+####  Recommendation:
+
+Send the following header with **all HTTPS responses**:
+
+`Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+
+-   `max-age=31536000` = 1 year
+
+-   `includeSubDomains` = applies to all subdomains
+
+-   `preload` = allows the domain to be added to browser preload lists (optional but recommended)
+
+**OWASP Reference:**\
+🔗 <https://owasp.org/www-project-secure-headers/#strict-transport-security>
+
+
+###  Remediation in Laravel
+
+This fix should only apply to **HTTPS connections**. So make sure your site is already using HTTPS (with a valid SSL certificate) before enforcing HSTS.
+
+
+#### Step 1: Reuse or Extend Existing Middleware
+
+If you've already created the `AddSecurityHeaders` middleware (from the previous `nosniff` fix), just **add** the following line:
+
+`$response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');`
+
+So your updated `handle()` method becomes:
+
+```
+public function handle(Request $request, Closure $next): Response
+{
+    $response = $next($request);
+
+    $response->headers->set('X-Content-Type-Options', 'nosniff');
+    $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+
+    return $response;
+}
+```
+
+> ⚠️ Optional: You can wrap it in a condition to apply only when HTTPS is used:
+
+```
+if ($request->isSecure()) {
+    $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+}
+```
+
+#### Step 2: Middleware Already Registered
+
+As long as your `AddSecurityHeaders` middleware is registered globally in `app/Http/Kernel.php` under `$middleware`, you're good to go:
+
+
+`\App\Http\Middleware\AddSecurityHeaders::class,`
+
+
+#### Result:
+
+Once implemented, HTTPS responses will include:
+
+`Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+
+-You can verify this in browser dev tools or with tools like [securityheaders.com](https://securityheaders.com/).
 
 ---
 
-###  X-Content-Type-Options Header Missing  
-**Severity:** Low  
-**Confidence:** Medium  
-**Description:**  
-Missing this header can allow the browser to interpret files as a different MIME type.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Could lead to script execution in the wrong context, risking XSS.  
+3.
+### 🛡️ Server Leaks Version Information via 'Server' HTTP Header
 
-**Recommendation:**  
-Set `X-Content-Type-Options: nosniff` on all responses.  
-**OWASP Reference:** https://owasp.org/www-project-secure-headers/#x-content-type-options  
+**Severity:** Low\
+**Confidence:** High\
+**Affected URL:** `http://studentrepo.iium.edu.my`
+
+
+#### 📄 Description:
+
+The application exposes the underlying **web server type and version** via the `Server` HTTP response header. For example:
+
+`Server: Apache/2.4.54 (Ubuntu)`
+
+This header is automatically sent by most web servers (e.g., Apache, Nginx) unless explicitly disabled.
+
+
+####  Business Impact:
+
+Disclosing the server type and version makes it easier for attackers to:
+
+-   **Fingerprint** the application stack
+
+-   Identify known vulnerabilities specific to that version
+
+-   Target automated exploits based on the server version
+
+
+####  Recommendation:
+
+**Suppress or obfuscate** the `Server` header in your web server configuration (not in Laravel).
+
+
+### 🛠️ Remediation (Web Server Level)
+
+####  If you're using Apache:
+
+Edit your Apache configuration (e.g., `apache2.conf` or a relevant `.conf` site file):
+
+1.  Disable server signature and server tokens:
+
+
+`ServerSignature Off
+ServerTokens Prod`
+
+This will make the `Server` header look like:
+
+`Server: Apache`
+
+Or if you want to remove it completely, use a reverse proxy or security module (see below).
+
+2.  Restart Apache:
+
+`sudo systemctl restart apache2`
+
+
+#### ✅ If you're using Nginx:
+
+Edit your `nginx.conf` file or site config:
+
+`server {
+    ...
+    server_tokens off;
+}`
+
+Then reload Nginx:
+
+`sudo nginx -s reload`
+
+To fully remove or mask the header, consider using a reverse proxy like **Cloudflare**, or **mod_headers** (Apache) / **headers_more** (Nginx) modules.
+
+---
+4.  
+### 🛡️ Server Leaks Information via `X-Powered-By` HTTP Header
+
+**Severity:** Low\
+**Confidence:** Medium\
+**Affected URL:** `http://studentrepo.iium.edu.my`
+
+
+#### 📄 Description:
+
+The application includes the `X-Powered-By` HTTP response header, which reveals internal details about the technology stack, such as the PHP version:
+
+`X-Powered-By: PHP/8.2.9`
+
+This header is typically sent by the PHP engine (or other language runtimes) unless explicitly disabled.
+
+
+####  Business Impact:
+
+Revealing the technology version and platform exposes the application to:
+
+-   **Targeted attacks** based on known vulnerabilities for that specific PHP version or framework.
+
+-   Easier fingerprinting for automated scanners and botnets.
+
+
+####  Recommendation:
+
+Disable the `X-Powered-By` header entirely to prevent technology leakage.
+
+
+### 🛠️ Remediation Steps (PHP & Laravel)
+
+Laravel itself doesn't add this header. It's sent by PHP and needs to be turned off in the **php.ini** configuration.
+
+
+#### Step 1: Locate your `php.ini` file
+
+This file is usually found at:
+
+-   `/etc/php/8.x/apache2/php.ini` (for Apache)
+
+-   `/etc/php/8.x/fpm/php.ini` (for Nginx + PHP-FPM)
+
+You can confirm the location by running:
+
+`php --ini`
+
+
+#### Step 2: Disable `X-Powered-By` in `php.ini`
+
+Find this line:
+
+`expose_php = On`
+
+Change it to:
+
+`expose_php = Off`
+
+
+#### Step 3: Restart your web server
+
+Depending on what you're using:
+
+`# Apache
+sudo systemctl restart apache2`
+
+`# Nginx + PHP-FPM
+sudo systemctl restart php8.x-fpm
+sudo systemctl reload nginx`
+
+
+#### Result:
+
+After this, the `X-Powered-By` header will be removed from all HTTP responses.
+
+You can verify it via browser dev tools or cURL:
+
+`curl -I http://studentrepo.iium.edu.my`
+
+You should no longer see:
+
+`X-Powered-By: PHP/8.2.9`
 
 
 ---
