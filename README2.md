@@ -135,39 +135,60 @@ When visiting any route, your app should respond with a CSP header like:
 
 `Content-Security-Policy: default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' https://fonts.googleapis.com; img-src 'self' data:; connect-src 'self'`
 
-You can view this in your browser's Developer Tools → **Network tab** → click any request → **Headers**.
 ---
 
-###  Missing Anti-clickjacking Header  
-**Severity:** Medium  
-**Confidence:** Medium  
-**Description:**  
-The page does not set an 'X-Frame-Options' or 'frame-ancestors' directive.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Leaves application vulnerable to clickjacking.
+### 🛡️ Missing Anti-clickjacking Header
 
-**Recommendation:**  
-Add appropriate CSP directive or X-Frame-Options header.  
-**OWASP Reference:** https://owasp.org/www-community/attacks/Clickjacking  
+**Severity:** Medium\
+**Confidence:** Medium
 
+**Description:**\
+The page response does not include any protection against **clickjacking** --- a form of attack where the web page is embedded inside a hidden or transparent iframe on a malicious site. The attacker tricks users into clicking something they didn't intend to (e.g., "Delete", "Pay", or "Submit").
 
----
-🔐 [Header Security] - Missing Security Headers
-###  Server Leaks Information via 'X-Powered-By' HTTP Header  
-**Severity:** Low  
-**Confidence:** Medium  
-**Description:**  
-The server includes 'X-Powered-By' in the response header, revealing the technology stack.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Attackers can target known vulnerabilities of disclosed technologies.
+**Affected URL:** <http://studentrepo.iium.edu.my>
 
-**Recommendation:**  
-Remove or obfuscate the 'X-Powered-By' header.  
-**OWASP Reference:** https://owasp.org/www-community/attacks/Information_exposure_through_HTTP_headers  
+**Business Impact:**\
+Without anti-clickjacking protection, your app can be embedded into another site using an `<iframe>`, potentially leading to unauthorized actions triggered by user clicks, especially on sensitive components like buttons or forms.
 
+**Recommendation:**\
+To prevent this, restrict iframe embedding by either:
 
+-   Using the legacy `X-Frame-Options: DENY` header
+
+-   Or using the modern and CSP-based `frame-ancestors 'none'` directive
+
+> ✅ Since CSP is already being used (via Spatie), we recommend enforcing iframe protection through `frame-ancestors`.
+
+**OWASP Reference:**\
+<https://owasp.org/www-community/attacks/Clickjacking>
+
+* * * * *
+
+#### 🛠️ Remediation Steps for Developers
+
+**Approach:** Add the `frame-ancestors` directive using the same custom CSP policy.
+
+**Step 1: Update `app/Csp/CustomPolicy.php`**\
+Add the following directive in the `configure()` method:
+
+`$this->addDirective(Directive::FRAME_ANCESTORS, [Keyword::NONE]);`
+
+> This directive tells the browser **not to allow the page to be embedded** in any `<iframe>`, effectively blocking all clickjacking attempts.
+
+Optional:\
+If your application legitimately needs to be embedded (e.g., in your own domain), you can use:
+
+`$this->addDirective(Directive::FRAME_ANCESTORS, ["'self'"]);`
+
+**Step 2: No further steps required**\
+The middleware is already active from the CSP setup. The new directive will be included in the existing `Content-Security-Policy` header automatically.
+
+**Expected Result:**\
+Response header now includes:
+
+`Content-Security-Policy: frame-ancestors 'none';`
+
+This prevents the page from being displayed in any iframe, stopping clickjacking.
 ---
 
 ###  Server Leaks Version Information via 'Server' HTTP Header  
