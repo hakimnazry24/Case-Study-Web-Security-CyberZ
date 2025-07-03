@@ -37,7 +37,8 @@
 
 ## 3. Detailed Findings
 
-✅ [CSP Specific] - Content Security Policy Related Only
+[CSP Specific] - Content Security Policy Related Only
+
 ### Content Security Policy (CSP) Header Not Set
 
 **Severity:** Medium\
@@ -59,7 +60,7 @@ Implement a strict but functional Content Security Policy that defines the allow
 
 
 
-#### 🛠️ Remediation Steps for Developers
+#### Remediation Steps for Developers
 
 **Approach:** Use [`spatie/laravel-csp`](https://github.com/spatie/laravel-csp) to enforce a CSP via middleware in Laravel.
 
@@ -157,13 +158,13 @@ To prevent this, restrict iframe embedding by either:
 
 -   Or using the modern and CSP-based `frame-ancestors 'none'` directive
 
-> ✅ Since CSP is already being used (via Spatie), we recommend enforcing iframe protection through `frame-ancestors`.
+>  Since CSP is already being used (via Spatie), we recommend enforcing iframe protection through `frame-ancestors`.
 
 **OWASP Reference:**\
 <https://owasp.org/www-community/attacks/Clickjacking>
 
 
-#### 🛠️ Remediation Steps for Developers
+####  Remediation Steps for Developers
 
 **Approach:** Add the `frame-ancestors` directive using the same custom CSP policy.
 
@@ -224,7 +225,7 @@ This prevents the browser from guessing the MIME type, forcing it to follow the 
 🔗 <https://owasp.org/www-project-secure-headers/#x-content-type-options>
 
 
-### 🛠️ Remediation in Laravel
+### Remediation in Laravel
 
 #### Step 1: Create Middleware
 
@@ -269,7 +270,7 @@ In `app/Http/Kernel.php`, add to the `$middleware` array:
 `\App\Http\Middleware\AddSecurityHeaders::class,`
 
 
-#### ✅ Result:
+#### Result:
 
 Every response will now include:
 
@@ -345,7 +346,7 @@ public function handle(Request $request, Closure $next): Response
 }
 ```
 
-> ⚠️ Optional: You can wrap it in a condition to apply only when HTTPS is used:
+>  Optional: You can wrap it in a condition to apply only when HTTPS is used:
 
 ```
 if ($request->isSecure()) {
@@ -372,7 +373,7 @@ Once implemented, HTTPS responses will include:
 ---
 
 3.
-### 🛡️ Server Leaks Version Information via 'Server' HTTP Header
+### Server Leaks Version Information via 'Server' HTTP Header
 
 **Severity:** Low\
 **Confidence:** High\
@@ -427,7 +428,7 @@ Or if you want to remove it completely, use a reverse proxy or security module (
 `sudo systemctl restart apache2`
 
 
-#### ✅ If you're using Nginx:
+#### If you're using Nginx:
 
 Edit your `nginx.conf` file or site config:
 
@@ -444,7 +445,7 @@ To fully remove or mask the header, consider using a reverse proxy like **Cloudf
 
 ---
 4.  
-### 🛡️ Server Leaks Information via `X-Powered-By` HTTP Header
+### Server Leaks Information via `X-Powered-By` HTTP Header
 
 **Severity:** Low\
 **Confidence:** Medium\
@@ -530,49 +531,172 @@ You should no longer see:
 
 ---
 [Information Disclosure] - Error Messages & Internal Info
-###  Application Error Disclosure  
-**Severity:** Low  
-**Confidence:** Medium  
-**Description:**  
-The application discloses technical error messages in responses.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Could provide attackers with information about the app’s internal structure or technology stack.  
 
-**Recommendation:**  
-Suppress detailed error messages in production environments and log them securely.  
-**OWASP Reference:** https://owasp.org/www-community/Improper_Error_Handling  
+### Improper Error Handling and Debug Information Disclosure
 
+**Severity:** Low\
+**Confidence:** Medium\
+**Affected URL(s):**
+
+-   `http://studentrepo.iium.edu.my`
+
+-   `https://studentrepo.iium.edu.my/server/opensearch/search?format=rss&query=*&scope=...`
+
+#### Description:
+
+The application reveals detailed **internal error messages** in HTTP responses. These include:
+
+-   PHP stack traces
+
+-   Exception class names
+
+-   Function/method names
+
+-   Full file system paths
+
+-   SQL error messages
+
+This behavior is often caused by:
+
+-   The Laravel application running with `APP_DEBUG=true`
+
+-   Unhandled exceptions that bubble up to the UI
+
+-   Debug mode misconfiguration in production
+
+
+
+#### Business Impact:
+
+Exposing internal error details provides attackers with useful insight into the application's structure and logic, such as:
+
+-   File locations
+
+-   Backend technologies
+
+-   Query structures
+
+-   Vulnerable endpoints
+
+This makes the app more susceptible to targeted attacks like SQL injection, file inclusion, and logic exploitation.
+
+
+#### Recommendation:
+
+1.  **Disable debug mode** in production:
+
+    -   Ensure `.env` file contains:
+
+        `APP_ENV=production
+        APP_DEBUG=false`
+
+2.  **Customize user-facing error pages**:
+
+    -   Blade templates in `resources/views/errors/` should return **non-technical messages**, such as:
+
+        `An unexpected error occurred. Please try again later.`
+
+3.  **Avoid exposing exception messages** in API responses:
+
+    -   In `app/Exceptions/Handler.php`, override the `render()` method:
+
+        ```
+        public function render($request, Throwable $exception)
+        {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'An internal error occurred.'
+                ], 500);
+            }
+
+            return parent::render($request, $exception);
+        }
+        
+        ```
+4.  **Log sensitive details internally**:
+
+    -   Laravel logs errors automatically to `storage/logs/laravel.log`.
+
+    -   Make sure logging is enabled but not exposed to the frontend.
+
+
+#### OWASP Reference:
+
+-   [https://owasp.org/www-community/Improper_Error_Handling](https://owasp.org/www-community/Improper_Error_Handling)
 ---
 
-###  Information Disclosure – Debug Error Messages  
-**Severity:** Low  
-**Confidence:** Medium  
-**Description:**  
-The server response contains debug error messages that can reveal application internals or misconfigurations.  
-**Affected URL:** https://studentrepo.iium.edu.my/server/opensearch/search?format=rss&query=*&scope=...  
-**Business Impact:**  
-Exposes information such as file paths, server errors, or code stack traces that attackers can leverage. 
-
-**Recommendation:**  
-Configure the server to suppress debug error messages in production. Display only user-friendly error pages.  
-**OWASP Reference:** https://owasp.org/www-community/Improper_Error_Handling  
-
----
 🍪 [Cookie Security]
-###  Cookie with SameSite Attribute None  
-**Severity:** Low  
-**Confidence:** Medium  
-**Description:**  
-Cookies are set with `SameSite=None` which may expose them to cross-site request forgery attacks.  
-**Affected URL:** http://studentrepo.iium.edu.my  
-**Business Impact:**  
-Could lead to CSRF attacks if cookies are sent cross-site without secure validation. 
+### Cookie with `SameSite=None` Attribute
 
-**Recommendation:**  
-Set the `SameSite` attribute to `Lax` or `Strict` depending on your application's requirements.  
-**OWASP Reference:** https://owasp.org/www-community/controls/SameSite  
+**Severity:** Low\
+**Confidence:** Medium\
+**Affected URL:** `http://studentrepo.iium.edu.my`
 
+
+####  Description:
+
+Cookies set by the application have the attribute `SameSite=None`, **without the `Secure` flag**, or are missing the `SameSite` attribute entirely. This allows the browser to send those cookies in **cross-site requests**, which can lead to **Cross-Site Request Forgery (CSRF)** and session hijacking risks.
+
+Example of risky cookie setting:
+
+`Set-Cookie: session_id=abc123; SameSite=None`
+
+
+####  Business Impact:
+
+If a user is authenticated and visits a malicious site, that site may trigger cross-site requests to the application with valid session cookies. Without `SameSite=Lax` or `Strict`, the browser **will send the cookies**, making **CSRF attacks possible**.
+
+
+####  Recommendation:
+
+Update your application to set the `SameSite` attribute properly. Recommended settings:
+
+
+`Set-Cookie: session_id=abc123; SameSite=Strict; Secure`
+
+-   Use `SameSite=Lax` for most cases (e.g., Laravel sessions).
+
+-   Use `SameSite=Strict` for highly sensitive operations (e.g., admin).
+
+-   Always use `Secure` if cookies are transmitted over HTTPS.
+
+
+####  OWASP Reference:
+
+-   [https://owasp.org/www-community/controls/SameSite](https://owasp.org/www-community/controls/SameSite)
+
+
+### Remediation in Laravel
+
+Laravel handles session cookies via configuration in `config/session.php`.
+
+
+#### Step 1: Configure `SameSite` in `config/session.php`
+
+Set this:
+
+`'samesite' => 'lax', // or 'strict' if needed`
+
+Other related settings to check:
+
+`'secure' => env('SESSION_SECURE_COOKIE', true),`
+
+This ensures cookies are sent only via HTTPS.
+
+
+#### Step 2: Set in `.env`
+
+`SESSION_SECURE_COOKIE=true`
+
+> This makes sure the `Secure` flag is always added to the session cookie.
+
+#### Result:
+
+Laravel will now send cookies like this:
+
+`Set-Cookie: laravel_session=abc123; path=/; HttpOnly; Secure; SameSite=Lax`
+
+This helps **mitigate CSRF** by restricting cross-origin cookie sending.
 
 ---
 
