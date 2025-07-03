@@ -445,6 +445,6 @@ Configure the server to suppress debug error messages in production. Display onl
 - **ZAP Version:** 2.16.1  
 - **Total Alerts Analyzed:** 17
 - **Person In Charge**
-  - Muhammad Hakim Bin Md Nazri 2110457
+  - Muhammad Hakim Bin Md Nazri 2110457 (hakimnazry@gmail.com)
   - Muhammad Fadly 2117999 (m.fadly@gmail.com)
-  - Muhammad Iqbal As Sufi bin Mahamad A'sim 2124165
+  - Muhammad Iqbal As Sufi bin Mahamad A'sim 2124165 (iqbalassufi@gmail.com)
