@@ -744,5 +744,6 @@ This helps **mitigate CSRF** by restricting cross-origin cookie sending.
   - http://studentrepo.iium.edu.my 
 - **ZAP Version:** 2.16.1  
 - **Total Alerts Analyzed:** 9
+  
 - **Person In Charge**
-- Muhammad Iqbal As Sufi bin Mahamad A'sim 2124165 (iqbalassufi@gmail.com)
+  - Muhammad Iqbal As Sufi bin Mahamad A'sim 2124165 (iqbalassufi@gmail.com)
