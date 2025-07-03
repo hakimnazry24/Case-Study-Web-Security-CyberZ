@@ -4,6 +4,7 @@
 **Date of Scan:** 2025-06-27  
 **Scanned By:** [CyberZ]  
 **Target Application:** http://studentrepo.iium.edu.my.
+
 **Scan Type:** Active   
 **Scan Duration:** ~2 minutes  
 
@@ -30,14 +31,22 @@
 | Critical   | 0                | -                                        |
 | High       | 0                | -                                        |
 | Medium     | 2                | Absence of Anti-CSRF Tokens, Content Security Policy (CSP) Header Not Set |
-| Low        | 7                | Cookie No HttpOnly Flag, Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
+| Low        | 7                |  Cookie without SameSite Attribute, Server Leaks Version Information via "Server" HTTP Response Header Field |
 | Info       | 0                | -                                        |
 
+A total of **9 security issues** were identified during the assessment.
+
+- **No critical or high-risk vulnerabilities** were found.
+- **2 medium-risk issues** require attention, including the absence of a Content Security Policy (CSP) header and missing anti-clickjacking protection.
+- **7 issues were classified as low-risk**, such as:
+  - Cookies missing the `SameSite` attribute
+  - Disclosure of web server and PHP version headers
+  - Missing `X-Content-Type-Options` header
+  - Improper error handling and debug information exposure
+    
 ---
 
 ## 3. Detailed Findings
-
-[CSP Specific] - Content Security Policy Related Only
 
 ### Content Security Policy (CSP) Header Not Set
 
@@ -77,12 +86,12 @@ This package simplifies the process of adding CSP headers by allowing policy-bas
 `php artisan vendor:publish --provider="Spatie\Csp\CspServiceProvider"`
 
 This generates the config file:\
-📄 `config/csp.php`
+ `config/csp.php`
 
 
 **Step 3: Create a custom CSP policy**\
 Create this file:\
-📄 `app/Csp/CustomPolicy.php`
+ `app/Csp/CustomPolicy.php`
 
 
 ```
@@ -222,7 +231,7 @@ This prevents the browser from guessing the MIME type, forcing it to follow the 
 
 
 **OWASP Reference:**\
-🔗 <https://owasp.org/www-project-secure-headers/#x-content-type-options>
+ <https://owasp.org/www-project-secure-headers/#x-content-type-options>
 
 
 ### Remediation in Laravel
@@ -318,7 +327,7 @@ Send the following header with **all HTTPS responses**:
 -   `preload` = allows the domain to be added to browser preload lists (optional but recommended)
 
 **OWASP Reference:**\
-🔗 <https://owasp.org/www-project-secure-headers/#strict-transport-security>
+ <https://owasp.org/www-project-secure-headers/#strict-transport-security>
 
 
 ###  Remediation in Laravel
@@ -380,7 +389,7 @@ Once implemented, HTTPS responses will include:
 **Affected URL:** `http://studentrepo.iium.edu.my`
 
 
-#### 📄 Description:
+####  Description:
 
 The application exposes the underlying **web server type and version** via the `Server` HTTP response header. For example:
 
@@ -404,8 +413,10 @@ Disclosing the server type and version makes it easier for attackers to:
 
 **Suppress or obfuscate** the `Server` header in your web server configuration (not in Laravel).
 
+**OWASP Reference: https://owasp.org/www-project-secure-headers/
 
-### 🛠️ Remediation (Web Server Level)
+
+###  Remediation (Web Server Level)
 
 ####  If you're using Apache:
 
@@ -452,7 +463,7 @@ To fully remove or mask the header, consider using a reverse proxy like **Cloudf
 **Affected URL:** `http://studentrepo.iium.edu.my`
 
 
-#### 📄 Description:
+####  Description:
 
 The application includes the `X-Powered-By` HTTP response header, which reveals internal details about the technology stack, such as the PHP version:
 
@@ -474,8 +485,10 @@ Revealing the technology version and platform exposes the application to:
 
 Disable the `X-Powered-By` header entirely to prevent technology leakage.
 
+OWASP Reference: https://owasp.org/www-community/attacks/Information_exposure_through_HTTP_headers
 
-### 🛠️ Remediation Steps (PHP & Laravel)
+
+###  Remediation Steps (PHP & Laravel)
 
 Laravel itself doesn't add this header. It's sent by PHP and needs to be turned off in the **php.ini** configuration.
 
@@ -625,7 +638,6 @@ This makes the app more susceptible to targeted attacks like SQL injection, file
 -   [https://owasp.org/www-community/Improper_Error_Handling](https://owasp.org/www-community/Improper_Error_Handling)
 ---
 
-🍪 [Cookie Security]
 ### Cookie with `SameSite=None` Attribute
 
 **Severity:** Low\
@@ -702,11 +714,25 @@ This helps **mitigate CSRF** by restricting cross-origin cookie sending.
 
 ## 4. Recommendations & Next Steps
 
-- Prioritize fixing medium-risk issues immediately  
-- Re-test after remediation  
-- Apply secure HTTP headers and configurations  
-- Schedule monthly security scans  
-- Consider a deeper security assessment via pen-test  
+###  Immediate Remediation
+- Prioritize fixing all **Medium-risk security issues**, especially:
+  - Missing security headers (CSP, X-Content-Type-Options, HSTS, etc.)
+  - Improper error handling and debug information exposure
+- Enforce secure defaults in Laravel:
+  - Set `APP_DEBUG=false` and `APP_ENV=production` in the `.env` file
+  - Configure proper error views and exception handling
+
+###  Technical Fixes Implemented
+- Applied secure HTTP headers using custom Laravel middleware
+- Disabled debug mode and exposed error output
+- Removed server and tech stack disclosure (`Server`, `X-Powered-By`)
+- Properly set `SameSite` and `Secure` cookie attributes
+
+### Post-Remediation Actions
+-  Conducted re-testing after fixes using OWASP ZAP
+-  Documented all security-related fixes in this repository
+-  Scheduled **monthly automated scans** for continuous security checks
+-  Recommend performing a full **penetration test** for in-depth validation
 
 ---
 
@@ -714,4 +740,6 @@ This helps **mitigate CSRF** by restricting cross-origin cookie sending.
 - **Sites Scanned**:
   - http://studentrepo.iium.edu.my 
 - **ZAP Version:** 2.16.1  
-- **Total Alerts Analyzed:** 17
+- **Total Alerts Analyzed:** 9
+- **Person In Charge**
+- Muhammad Iqbal As Sufi bin Mahamad A'sim 2124165 (iqbalassufi@gmail.com)
