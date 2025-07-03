@@ -737,6 +737,9 @@ This helps **mitigate CSRF** by restricting cross-origin cookie sending.
 ---
 
 ## Appendix
+
+[OWASP ZAP Report (HTML)](https://github.com/hakimnazry24/Case-Study-Web-Security-CyberZ/raw/main/studentRepoZAPReport.html)
+
 - **Sites Scanned**:
   - http://studentrepo.iium.edu.my 
 - **ZAP Version:** 2.16.1  
